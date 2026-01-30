@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { sms } from '../api/client';
 
 function formatDate(dateString) {
-  return new Date(dateString).toLocaleString('en-US', {
+  // SQLite stores UTC but without timezone marker, so add 'Z' to indicate UTC
+  const utcDate = dateString.includes('Z') ? dateString : dateString.replace(' ', 'T') + 'Z';
+  return new Date(utcDate).toLocaleString('en-US', {
     timeZone: 'America/Chicago',
     month: 'short',
     day: 'numeric',
