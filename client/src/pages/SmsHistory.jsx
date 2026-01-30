@@ -14,10 +14,18 @@ function formatDate(dateString) {
   });
 }
 
-function StatusBadge({ status }) {
+function StatusBadge({ status, acknowledged }) {
+  if (acknowledged) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        Reply Received
+      </span>
+    );
+  }
+
   const colors = {
     sent: 'bg-blue-100 text-blue-800',
-    delivered: 'bg-green-100 text-green-800',
+    delivered: 'bg-blue-100 text-blue-800',
     failed: 'bg-red-100 text-red-800',
     pending: 'bg-yellow-100 text-yellow-800',
     queued: 'bg-gray-100 text-gray-800',
@@ -25,7 +33,7 @@ function StatusBadge({ status }) {
 
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors[status] || 'bg-gray-100 text-gray-800'}`}>
-      {status}
+      {status === 'sent' || status === 'delivered' ? 'Sent' : status}
     </span>
   );
 }
@@ -94,6 +102,9 @@ export default function SmsHistory() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Reply
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -113,7 +124,10 @@ export default function SmsHistory() {
                     {msg.message}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge status={msg.status} />
+                    <StatusBadge status={msg.status} acknowledged={msg.acknowledged_at} />
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {msg.reply_message || '-'}
                   </td>
                 </tr>
               ))}
