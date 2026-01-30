@@ -68,4 +68,16 @@ try {
   // Column already exists, ignore
 }
 
+// Add acknowledgment columns to sms_log if they don't exist
+try {
+  db.exec(`ALTER TABLE sms_log ADD COLUMN acknowledged_at DATETIME`);
+} catch (e) {
+  // Column already exists, ignore
+}
+try {
+  db.exec(`ALTER TABLE sms_log ADD COLUMN reply_message TEXT`);
+} catch (e) {
+  // Column already exists, ignore
+}
+
 export default db;

@@ -14,15 +14,29 @@ function formatDate(dateString) {
   });
 }
 
-function SmsStatusBadge({ status }) {
+function SmsStatusBadge({ status, acknowledged, reply }) {
+  if (!status) return null;
+
+  // If acknowledged, show that instead of just status
+  if (acknowledged) {
+    return (
+      <div className="text-right">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+          Acknowledged
+        </span>
+        {reply && (
+          <p className="text-xs text-gray-500 mt-1">"{reply}"</p>
+        )}
+      </div>
+    );
+  }
+
   const colors = {
     sent: 'bg-blue-100 text-blue-800',
     delivered: 'bg-green-100 text-green-800',
     failed: 'bg-red-100 text-red-800',
     pending: 'bg-yellow-100 text-yellow-800',
   };
-
-  if (!status) return null;
 
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${colors[status] || 'bg-gray-100 text-gray-800'}`}>
@@ -137,7 +151,7 @@ export default function Dashboard() {
                       <div className="text-right">
                         <p className="text-sm text-gray-500">{formatDate(call.created_at)}</p>
                         <p className="text-xs text-gray-400">Logged by {call.logged_by_name}</p>
-                        <SmsStatusBadge status={call.sms_status} />
+                        <SmsStatusBadge status={call.sms_status} acknowledged={call.sms_acknowledged_at} reply={call.sms_reply} />
                       </div>
                     </div>
                     {call.notes && (

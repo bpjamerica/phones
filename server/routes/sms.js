@@ -31,4 +31,31 @@ router.post('/webhook', (req, res) => {
   res.sendStatus(200);
 });
 
+// Twilio webhook for incoming SMS (replies) - no auth required
+router.post('/incoming', (req, res) => {
+  const { From, Body } = req.body;
+
+  console.log(`Incoming SMS from ${From}: ${Body}`);
+
+  if (From && Body) {
+    try {
+      // Normalize phone number (remove any formatting)
+      const phone = From.replace(/[^\d+]/g, '');
+      const result = smsLog.acknowledgeByPhone(phone, Body);
+
+      if (result) {
+        console.log(`Acknowledged SMS for call ${result.call_id}`);
+      } else {
+        console.log(`No unacknowledged SMS found for phone ${phone}`);
+      }
+    } catch (error) {
+      console.error('Incoming SMS error:', error);
+    }
+  }
+
+  // Respond with empty TwiML (no auto-reply)
+  res.type('text/xml');
+  res.send('<?xml version="1.0" encoding="UTF-8"?><Response></Response>');
+});
+
 export default router;

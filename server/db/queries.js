@@ -86,7 +86,9 @@ export const calls = {
         lr.name as logged_by_name,
         cr.name as customer_rep_name,
         cr.phone as customer_rep_phone,
-        (SELECT status FROM sms_log WHERE call_id = c.id ORDER BY sent_at DESC LIMIT 1) as sms_status
+        (SELECT status FROM sms_log WHERE call_id = c.id ORDER BY sent_at DESC LIMIT 1) as sms_status,
+        (SELECT acknowledged_at FROM sms_log WHERE call_id = c.id ORDER BY sent_at DESC LIMIT 1) as sms_acknowledged_at,
+        (SELECT reply_message FROM sms_log WHERE call_id = c.id ORDER BY sent_at DESC LIMIT 1) as sms_reply
       FROM calls c
       JOIN reps lr ON c.logged_by_rep_id = lr.id
       JOIN reps cr ON c.customer_rep_id = cr.id
@@ -137,7 +139,9 @@ export const calls = {
         lr.name as logged_by_name,
         cr.name as customer_rep_name,
         cr.id as rep_id,
-        (SELECT status FROM sms_log WHERE call_id = c.id ORDER BY sent_at DESC LIMIT 1) as sms_status
+        (SELECT status FROM sms_log WHERE call_id = c.id ORDER BY sent_at DESC LIMIT 1) as sms_status,
+        (SELECT acknowledged_at FROM sms_log WHERE call_id = c.id ORDER BY sent_at DESC LIMIT 1) as sms_acknowledged_at,
+        (SELECT reply_message FROM sms_log WHERE call_id = c.id ORDER BY sent_at DESC LIMIT 1) as sms_reply
       FROM calls c
       JOIN reps lr ON c.logged_by_rep_id = lr.id
       JOIN reps cr ON c.customer_rep_id = cr.id
@@ -199,6 +203,31 @@ export const smsLog = {
       WHERE s.call_id = ?
       ORDER BY s.sent_at DESC
     `).all(callId);
+  },
+
+  // Find most recent unacknowledged SMS sent to a phone number and acknowledge it
+  acknowledgeByPhone: (phone, replyMessage) => {
+    // Find the rep by phone number
+    const rep = db.prepare(`SELECT id FROM reps WHERE phone = ?`).get(phone);
+    if (!rep) return null;
+
+    // Find their most recent unacknowledged SMS
+    const sms = db.prepare(`
+      SELECT id, call_id FROM sms_log
+      WHERE to_rep_id = ? AND acknowledged_at IS NULL
+      ORDER BY sent_at DESC LIMIT 1
+    `).get(rep.id);
+
+    if (!sms) return null;
+
+    // Mark it as acknowledged
+    db.prepare(`
+      UPDATE sms_log
+      SET acknowledged_at = CURRENT_TIMESTAMP, reply_message = ?
+      WHERE id = ?
+    `).run(replyMessage, sms.id);
+
+    return sms;
   }
 };
 
