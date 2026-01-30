@@ -54,8 +54,8 @@ export default function Dashboard() {
     setError('');
     try {
       const data = await calls.getAll({
-        startDate: startDate ? `${startDate}T00:00:00` : undefined,
-        endDate: endDate ? `${endDate}T23:59:59` : undefined,
+        startDate: startDate ? `${startDate} 00:00:00` : undefined,
+        endDate: endDate ? `${endDate} 23:59:59` : undefined,
         grouped: 'true',
       });
       setGroupedCalls(data);
