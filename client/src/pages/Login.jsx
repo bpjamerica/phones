@@ -27,7 +27,7 @@ export default function Login({ setUser }) {
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
         <div>
           <h2 className="text-center text-3xl font-bold text-gray-900">
-            Night Shift Call Tracker
+            After Hours
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Sign in to log calls

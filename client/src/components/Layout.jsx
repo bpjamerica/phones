@@ -31,7 +31,7 @@ export default function Layout({ children, user, setUser }) {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between h-16">
             <div className="flex items-center space-x-8">
-              <span className="font-bold text-xl">Night Shift Tracker</span>
+              <span className="font-bold text-xl">After Hours</span>
               <div className="flex space-x-4">
                 {navItems.map((item) => (
                   <Link
