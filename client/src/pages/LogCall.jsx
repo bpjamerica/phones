@@ -29,6 +29,16 @@ export default function LogCall({ user }) {
         return a.name.localeCompare(b.name);
       });
       setRepsList(sorted);
+
+      // Pre-select "Unassigned / New Customer" and uncheck SMS
+      const unassigned = sorted.find(r => r.name === 'Unassigned / New Customer');
+      if (unassigned) {
+        setForm(prev => ({
+          ...prev,
+          customer_rep_id: unassigned.id.toString(),
+          send_sms: false,
+        }));
+      }
     } catch (err) {
       setError('Failed to load reps');
     }
@@ -80,13 +90,14 @@ export default function LogCall({ user }) {
       }
       setSuccess(successMsg);
 
-      // Reset form
+      // Reset form - keep Unassigned selected
+      const unassigned = repsList.find(r => r.name === 'Unassigned / New Customer');
       setForm({
         customer_name: '',
         customer_phone: '',
-        customer_rep_id: '',
+        customer_rep_id: unassigned ? unassigned.id.toString() : '',
         notes: '',
-        send_sms: true,
+        send_sms: false,
       });
     } catch (err) {
       setError(err.message);
