@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.js';
 import repsRoutes from './routes/reps.js';
 import callsRoutes from './routes/calls.js';
 import smsRoutes from './routes/sms.js';
+import setupRoutes from './routes/setup.js';
 
 // Import db to ensure tables are created
 import './db/schema.js';
@@ -54,6 +55,9 @@ app.use('/api/sms', smsRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Setup route (only works if no users exist)
+app.use('/setup', setupRoutes);
 
 // Serve static files in production
 if (isProduction) {
