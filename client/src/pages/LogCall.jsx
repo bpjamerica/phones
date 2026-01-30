@@ -47,14 +47,14 @@ export default function LogCall({ user }) {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    // Auto-uncheck SMS when "Unassigned" is selected
+    // Auto-toggle SMS based on rep selection
     if (name === 'customer_rep_id') {
       const selectedRep = repsList.find(r => r.id === parseInt(value));
       const isUnassigned = selectedRep?.name === 'Unassigned / New Customer';
       setForm((prev) => ({
         ...prev,
         [name]: value,
-        send_sms: isUnassigned ? false : prev.send_sms,
+        send_sms: !isUnassigned, // Check SMS for real reps, uncheck for Unassigned
       }));
       return;
     }
