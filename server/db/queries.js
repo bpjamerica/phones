@@ -207,8 +207,14 @@ export const smsLog = {
 
   // Find most recent unacknowledged SMS sent to a phone number and acknowledge it
   acknowledgeByPhone: (phone, replyMessage) => {
-    // Find the rep by phone number
-    const rep = db.prepare(`SELECT id FROM reps WHERE phone = ?`).get(phone);
+    // Normalize phone - get last 10 digits for matching
+    const digits = phone.replace(/\D/g, '').slice(-10);
+
+    // Find the rep by phone number (match last 10 digits)
+    const rep = db.prepare(`
+      SELECT id FROM reps
+      WHERE REPLACE(REPLACE(REPLACE(REPLACE(phone, '+', ''), '-', ''), '(', ''), ')', '') LIKE '%' || ?
+    `).get(digits);
     if (!rep) return null;
 
     // Find their most recent unacknowledged SMS
