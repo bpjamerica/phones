@@ -86,13 +86,13 @@ router.post('/', requireAuth, async (req, res) => {
 
         const result = await sendSMS(customerRep.phone, message);
 
-        // Log the SMS
+        // Log the SMS (use 'sent' for success - Twilio returns 'queued' initially but it sends immediately)
         smsLog.create({
           call_id: call.id,
           to_rep_id: customer_rep_id,
           message,
           twilio_sid: result.sid,
-          status: result.success ? (result.status || 'sent') : 'failed'
+          status: result.success ? 'sent' : 'failed'
         });
 
         smsResult = result;
