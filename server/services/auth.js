@@ -31,7 +31,8 @@ export async function authenticateUser(email, password) {
       id: rep.id,
       name: rep.name,
       email: rep.email,
-      is_admin: rep.is_admin
+      is_admin: rep.is_admin,
+      must_change_password: rep.must_change_password
     }
   };
 }

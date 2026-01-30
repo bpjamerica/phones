@@ -33,12 +33,12 @@ export const reps = {
     `).get(email);
   },
 
-  create: ({ name, phone, email, password_hash, is_admin = 0 }) => {
+  create: ({ name, phone, email, password_hash, is_admin = 0, must_change_password = 0 }) => {
     const stmt = db.prepare(`
-      INSERT INTO reps (name, phone, email, password_hash, is_admin)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO reps (name, phone, email, password_hash, is_admin, must_change_password)
+      VALUES (?, ?, ?, ?, ?, ?)
     `);
-    const result = stmt.run(name, phone, email, password_hash, is_admin);
+    const result = stmt.run(name, phone, email, password_hash, is_admin, must_change_password);
     return { id: result.lastInsertRowid, name, phone, email, is_admin };
   },
 
@@ -57,7 +57,7 @@ export const reps = {
   },
 
   updatePassword: (id, password_hash) => {
-    const stmt = db.prepare(`UPDATE reps SET password_hash = ? WHERE id = ?`);
+    const stmt = db.prepare(`UPDATE reps SET password_hash = ?, must_change_password = 0 WHERE id = ?`);
     stmt.run(password_hash, id);
   }
 };

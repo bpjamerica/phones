@@ -7,10 +7,14 @@ import LogCall from './pages/LogCall';
 import Dashboard from './pages/Dashboard';
 import SmsHistory from './pages/SmsHistory';
 import ManageReps from './pages/ManageReps';
+import ChangePassword from './pages/ChangePassword';
 
 function ProtectedRoute({ user, children }) {
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+  if (user.must_change_password) {
+    return <Navigate to="/change-password" replace />;
   }
   return children;
 }
@@ -18,6 +22,9 @@ function ProtectedRoute({ user, children }) {
 function AdminRoute({ user, children }) {
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+  if (user.must_change_password) {
+    return <Navigate to="/change-password" replace />;
   }
   if (!user.is_admin) {
     return <Navigate to="/" replace />;
@@ -58,7 +65,27 @@ export default function App() {
         <Route
           path="/login"
           element={
-            user ? <Navigate to="/" replace /> : <Login setUser={setUser} />
+            user ? (
+              user.must_change_password ? (
+                <Navigate to="/change-password" replace />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            ) : (
+              <Login setUser={setUser} />
+            )
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            !user ? (
+              <Navigate to="/login" replace />
+            ) : !user.must_change_password ? (
+              <Navigate to="/" replace />
+            ) : (
+              <ChangePassword user={user} setUser={setUser} />
+            )
           }
         />
         <Route

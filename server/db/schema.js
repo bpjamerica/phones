@@ -61,4 +61,11 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_sms_log_call_id ON sms_log(call_id);
 `);
 
+// Add must_change_password column if it doesn't exist
+try {
+  db.exec(`ALTER TABLE reps ADD COLUMN must_change_password INTEGER DEFAULT 0`);
+} catch (e) {
+  // Column already exists, ignore
+}
+
 export default db;

@@ -64,7 +64,7 @@ router.post('/', requireAdmin, async (req, res) => {
     }
 
     try {
-      reps.create({ name, phone, email, password_hash, is_admin: 0 });
+      reps.create({ name, phone, email, password_hash, is_admin: 0, must_change_password: 1 });
       results.success.push(name);
     } catch (error) {
       results.failed.push({ line, error: error.message });
