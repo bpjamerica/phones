@@ -10,6 +10,7 @@ import repsRoutes from './routes/reps.js';
 import callsRoutes from './routes/calls.js';
 import smsRoutes from './routes/sms.js';
 import setupRoutes from './routes/setup.js';
+import bulkRoutes from './routes/bulk.js';
 
 // Import db to ensure tables are created
 import './db/schema.js';
@@ -58,6 +59,9 @@ app.get('/api/health', (req, res) => {
 
 // Setup route (only works if no users exist)
 app.use('/setup', setupRoutes);
+
+// Bulk import route (admin only)
+app.use('/api/bulk', bulkRoutes);
 
 // Serve static files in production
 if (isProduction) {
