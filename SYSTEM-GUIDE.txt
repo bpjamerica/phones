@@ -1,19 +1,20 @@
 ================================================================================
-NIGHT SHIFT CALL TRACKING SYSTEM - COMPLETE GUIDE
+AFTER HOURS - CALL TRACKING SYSTEM - COMPLETE GUIDE
 ================================================================================
 
 WHAT THIS SYSTEM DOES
 ---------------------
-- Night shift reps log incoming customer calls
+- After hours reps log incoming customer calls
 - System sends SMS to the rep who owns that customer (via Twilio)
+- Reps can REPLY to SMS to acknowledge receipt
 - Morning dashboard shows all overnight activity grouped by rep
-- Tracks all SMS messages sent with delivery status
+- Tracks all SMS messages sent with delivery status and replies
 
 ================================================================================
 
 ACCESSING THE SYSTEM
 --------------------
-Live URL: https://phones-production.up.railway.app (or your Railway URL)
+Live URL: https://phones-production.up.railway.app
 Local Dev: http://localhost:5173
 
 ================================================================================
@@ -36,16 +37,31 @@ HOW TO LOG A CALL (Main Feature)
 --------------------------------
 1. Log in
 2. You're on the "Log Call" page by default
-3. Fill in:
+3. Form defaults to "Unassigned / New Customer" with SMS unchecked
+4. Fill in:
    - Customer Name (required)
    - Customer Phone (optional - for callback)
-   - Select which rep owns this customer (required)
+   - Select which rep owns this customer
    - Notes about the call
-   - Check "Send SMS notification" to text the rep
-4. Click "Save Call"
+5. SMS behavior:
+   - "Unassigned / New Customer" selected = SMS unchecked (no one to notify)
+   - Any real rep selected = SMS auto-checked (will notify them)
+6. Click "Save Call"
 
 The customer's rep will receive an SMS like:
 "Call from John Smith (555-1234) logged by Night Rep. Notes: Customer needs callback about order #123"
+
+================================================================================
+
+SMS ACKNOWLEDGMENT (Reply Feature)
+----------------------------------
+When a rep receives an SMS notification:
+1. They can reply with ANYTHING ("OK", "Got it", "Thanks", etc.)
+2. The system records their reply
+3. Dashboard shows "Acknowledged" with their reply message
+4. SMS History shows "Reply Received" and the actual reply
+
+This lets you know the rep saw the message.
 
 ================================================================================
 
@@ -53,7 +69,11 @@ PAGES/FEATURES
 --------------
 1. LOG CALL (/) - Main screen for logging calls
 2. DASHBOARD (/dashboard) - View all calls grouped by rep, filter by date
-3. SMS HISTORY (/sms-history) - See all SMS messages sent and their status
+   - Shows SMS status (Sent, Acknowledged)
+   - Shows reply message if acknowledged
+3. SMS HISTORY (/sms-history) - See all SMS messages sent
+   - Status: Sent or Reply Received
+   - Reply: Shows actual reply message
 4. MANAGE REPS (/reps) - Admin only - add/edit reps
 
 ================================================================================
@@ -72,7 +92,7 @@ Option 1: One at a time
 Option 2: Bulk Import
 ---------------------
 1. Log in as admin
-2. Go to: https://YOUR-URL/api/bulk
+2. Go to: https://phones-production.up.railway.app/api/bulk
 3. Set a default password (e.g., "welcome123")
 4. Paste reps in format: Name, Email, Phone
    Example:
@@ -87,21 +107,27 @@ Tell them: "Your login is your email. Password is welcome123. You'll change it o
 
 FIRST-TIME SETUP (Admin Creation)
 ---------------------------------
-1. Go to: https://YOUR-URL/setup
+1. Go to: https://phones-production.up.railway.app/setup
 2. Fill in admin name, email, phone, password
 3. This page only works ONCE (when no users exist)
 
 ================================================================================
 
-TWILIO SMS CONFIGURATION
-------------------------
-Environment variables needed (get from Twilio console):
+TWILIO CONFIGURATION
+--------------------
+Environment variables (set in Railway dashboard → Variables):
 - TWILIO_ACCOUNT_SID=your_account_sid
 - TWILIO_AUTH_TOKEN=your_auth_token
-- TWILIO_PHONE_NUMBER=your_twilio_phone_number
+- TWILIO_PHONE_NUMBER=+14092634032
 
-These are set in Railway dashboard under Variables.
-(Actual credentials are stored in Railway, not in code)
+WEBHOOK FOR REPLIES:
+To receive SMS replies, configure in Twilio Console:
+1. Go to: console.twilio.com
+2. Phone Numbers → Active Numbers → click your number
+3. Messaging Configuration → "A message comes in":
+   - URL: https://phones-production.up.railway.app/api/sms/incoming
+   - Method: POST
+4. Save
 
 ================================================================================
 
@@ -147,7 +173,7 @@ DATABASE
 SQLite database with 3 tables:
 - reps: User accounts (name, email, phone, password, admin flag)
 - calls: Logged calls (customer info, notes, timestamps)
-- sms_log: SMS history (message, status, Twilio ID)
+- sms_log: SMS history (message, status, reply, acknowledged timestamp)
 
 ================================================================================
 
@@ -172,5 +198,16 @@ To make changes:
 
 ================================================================================
 
+QUICK REFERENCE
+---------------
+- Default password for bulk import: Set it yourself (e.g., "welcome123")
+- New reps must change password on first login
+- "Unassigned / New Customer" = no SMS sent
+- Select real rep = SMS auto-checked
+- Reps reply to SMS = shows as "Acknowledged" on dashboard
+
+================================================================================
+
 CREATED: January 2026
+UPDATED: January 2026
 ================================================================================
