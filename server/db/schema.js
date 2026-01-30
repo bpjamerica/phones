@@ -80,4 +80,13 @@ try {
   // Column already exists, ignore
 }
 
+// Create "Unassigned / New Customer" rep if it doesn't exist
+const unassignedRep = db.prepare(`SELECT id FROM reps WHERE email = 'unassigned@system'`).get();
+if (!unassignedRep) {
+  db.prepare(`
+    INSERT INTO reps (name, phone, email, password_hash, is_active, is_admin)
+    VALUES ('Unassigned / New Customer', '', 'unassigned@system', 'nologin', 1, 0)
+  `).run();
+}
+
 export default db;

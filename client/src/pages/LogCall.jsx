@@ -22,7 +22,13 @@ export default function LogCall({ user }) {
   const loadReps = async () => {
     try {
       const data = await reps.getAll();
-      setRepsList(data);
+      // Sort to put "Unassigned / New Customer" at the top
+      const sorted = data.sort((a, b) => {
+        if (a.name === 'Unassigned / New Customer') return -1;
+        if (b.name === 'Unassigned / New Customer') return 1;
+        return a.name.localeCompare(b.name);
+      });
+      setRepsList(sorted);
     } catch (err) {
       setError('Failed to load reps');
     }
@@ -30,6 +36,19 @@ export default function LogCall({ user }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    // Auto-uncheck SMS when "Unassigned" is selected
+    if (name === 'customer_rep_id') {
+      const selectedRep = repsList.find(r => r.id === parseInt(value));
+      const isUnassigned = selectedRep?.name === 'Unassigned / New Customer';
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+        send_sms: isUnassigned ? false : prev.send_sms,
+      }));
+      return;
+    }
+
     setForm((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
